@@ -26,7 +26,7 @@ export default function Appointment() {
               {p.phone && <a className="btn ghost sm" href={'tel:' + p.phone}>{p.phone}</a>}
               {p.whatsapp && <a className="btn ghost sm" href={'https://wa.me/' + p.whatsapp.replace(/\D/g, '')}>WhatsApp</a>}
               {p.email && <a className="btn ghost sm" href={'mailto:' + p.email}>Email</a>}
-              <button className="btn sm" onClick={() => { setF({ ...f, pastor_id: p.id }); document.getElementById('rdv').scrollIntoView({ behavior: 'smooth' }); }}>{t('Choisir ce pasteur', 'Pick this pastor')}</button>
+              <button className="btn sm" onClick={() => { setF({ ...f, pastor_id: p.id }); document.getElementById('rdv').scrollIntoView(); }}>{t('Choisir ce pasteur', 'Pick this pastor')}</button>
             </div>
           </div>
         ))}

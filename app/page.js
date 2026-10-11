@@ -117,6 +117,7 @@ function NewHere() {
 function Location() {
   const { s, t, S } = useApp();
   const qy = encodeURIComponent(S.maps_query || S.address || 'Lomé, Togo');
+  const link = S.maps_link || `https://www.google.com/maps/dir/?api=1&destination=${qy}`;
   return (
     <section className="sec alt" id="localisation"><div className="wrap two">
       <div className="stack rv">
@@ -124,8 +125,9 @@ function Location() {
         <p className="lead">{s('address')}</p>
         <p style={{ whiteSpace: 'pre-line' }}>{s('access')}</p>
         <a className="btn" target="_blank" rel="noreferrer" href={`https://www.google.com/maps/dir/?api=1&destination=${qy}`}>{t('Obtenir l\'itinéraire', 'Get directions')}</a>
+        <a className="btn ghost" target="_blank" rel="noreferrer" href={link}>{t('Ouvrir dans Google Maps', 'Open in Google Maps')}</a>
       </div>
-      <iframe className="map rv" title="Plan" loading="lazy" src={`https://maps.google.com/maps?q=${qy}&z=15&output=embed`} />
+      <iframe className="map rv" title="Plan" loading="lazy" src={`https://maps.google.com/maps?q=${qy}&z=17&output=embed`} />
     </div></section>
   );
 }
