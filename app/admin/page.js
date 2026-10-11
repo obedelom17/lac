@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { post } from '@/components/Providers';
-import { RES, SET } from '@/lib/resources';
+import { RES, SET, GROUPS, setMeta } from '@/lib/resources';
 import { Msg } from '@/components/ui';
 
 const api = async (url, method = 'GET', body) => {
@@ -97,16 +97,20 @@ function Crud({ res }) {
   );
 }
 
-function Settings() {
+function Settings({ group }) {
   const [v, setV] = useState(null);
   const [m, setM] = useState(null);
-  useEffect(() => { api('/api/admin/settings').then(setV); }, []);
+  const g = GROUPS.find((x) => x[0] === group);
+  const keys = SET.filter(([k]) => setMeta(k)[0] === group);
+  useEffect(() => { setM(null); api('/api/admin/settings').then(setV); }, [group]);
   if (!v) return <p className="mute">Chargement…</p>;
   return (
-    <form onSubmit={async (e) => { e.preventDefault(); const j = await api('/api/admin/settings', 'POST', v); setM(j.error ? { err: 1, text: 'Erreur' } : { text: 'Réglages enregistrés' }); }}>
-      <h2 style={{ fontSize: '1.8rem' }}>Réglages du site</h2>
-      <p className="mute">Textes d'accueil, adresse, liens, chaînes YouTube (une par ligne : Nom|IDENTIFIANT), début du jeûne (AAAA-MM-JJ). Les champs _en sont les traductions anglaises.</p>
-      {SET.map(([k, t]) => <label className="f" key={k}>{label(k)}<Field name={k} type={t} value={v[k]} onChange={(x) => setV({ ...v, [k]: x })} /></label>)}
+    <form onSubmit={async (e) => { e.preventDefault(); const body = Object.fromEntries(keys.map(([k]) => [k, v[k]])); const j = await api('/api/admin/settings', 'POST', body); setM(j.error ? { err: 1, text: 'Erreur' } : { text: 'Enregistré' }); }}>
+      <h2 style={{ fontSize: '1.8rem' }}>{g[1]}</h2>
+      <p className="mute">{g[2]}</p>
+      {keys.map(([k, t]) => { const [, lab, hint] = setMeta(k); return (
+        <label className="f" key={k}>{lab}{hint && <small className="mute" style={{ display: 'block', fontWeight: 400 }}>{hint}</small>}<Field name={k} type={t} value={v[k]} onChange={(x) => setV({ ...v, [k]: x })} /></label>
+      ); })}
       <button className="btn" style={{ marginTop: '1.2rem' }}>Enregistrer</button><Msg m={m} />
     </form>
   );
@@ -130,7 +134,7 @@ export default function Admin() {
   const [ok, setOk] = useState(null);
   const [pw, setPw] = useState('');
   const [err, setErr] = useState(false);
-  const [tab, setTab] = useState('settings');
+  const [tab, setTab] = useState('set:accueil');
   useEffect(() => { api('/api/admin/login').then((j) => setOk(!!j.admin)); }, []);
   if (ok === null) return null;
   if (!ok) return (
@@ -143,14 +147,14 @@ export default function Admin() {
       </form>
     </div>
   );
-  const tabs = [['settings', 'Réglages du site'], ...Object.entries(RES).map(([k, v]) => [k, v.label]), ['push', 'Notifications']];
+  const tabs = [...GROUPS.map(([k, l]) => ['set:' + k, l]), ...Object.entries(RES).map(([k, v]) => [k, v.label]), ['push', 'Notifications']];
   return (
     <div className="wrap adm">
       <aside>
         {tabs.map(([k, l]) => <button key={k} className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>{l}</button>)}
         <button onClick={async () => { await post('/api/admin/login', { logout: 1 }); setOk(false); }}>Déconnexion</button>
       </aside>
-      <section>{tab === 'settings' ? <Settings /> : tab === 'push' ? <Push /> : <Crud res={tab} key={tab} />}</section>
+      <section>{tab.startsWith('set:') ? <Settings group={tab.slice(4)} key={tab} /> : tab === 'push' ? <Push /> : <Crud res={tab} key={tab} />}</section>
     </div>
   );
 }
