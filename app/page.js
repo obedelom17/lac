@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp, useData } from '@/components/Providers';
 import { Img, initials, fmtPrice } from '@/components/ui';
 import Verse from '@/components/Verse';
@@ -9,9 +9,7 @@ function Hero() {
   const { s, t, S, tr, lang } = useApp();
   const ev = useData('events');
   const sv = useData('services');
-  const [paused, setPaused] = useState(false);
   const [i, setI] = useState(0);
-  const vid = useRef(null);
   const w = (s('hero_title') || '').split(' ');
   const k = Math.ceil(w.length / 3);
   const title = [w.slice(0, k).join(' '), w.slice(k, 2 * k).join(' '), w.slice(2 * k).join(' ')].filter(Boolean);
@@ -20,11 +18,10 @@ function Hero() {
   if (!cards.length && sv?.length) cards.push({ k: 's', tag: t('Culte', 'Service'), date: `${sv[0].day} · ${sv[0].time}`, title: tr(sv[0], 'label'), text: S.address, href: '#suite' });
   const n = cards.length;
   const c = cards[n ? i % n : 0];
-  useEffect(() => { if (paused || n < 2) return; const id = setInterval(() => setI((x) => x + 1), 6000); return () => clearInterval(id); }, [paused, n]);
-  useEffect(() => { if (vid.current) { if (paused) vid.current.pause(); else vid.current.play().catch(() => {}); } }, [paused]);
+  useEffect(() => { if (n < 2) return; const id = setInterval(() => setI((x) => x + 1), 6000); return () => clearInterval(id); }, [n]);
   return (
-    <section className={'hero' + (paused ? ' paused' : '')}>
-      {S.hero_video ? <video ref={vid} className="hmedia" src={S.hero_video} poster={S.hero_image || undefined} autoPlay muted loop playsInline /> : S.hero_image ? <img className="hmedia kb" src={S.hero_image} alt="" /> : null}
+    <section className="hero">
+      {S.hero_video ? <video className="hmedia" src={S.hero_video} poster={S.hero_image || undefined} autoPlay muted loop playsInline /> : S.hero_image ? <img className="hmedia kb" src={S.hero_image} alt="" /> : null}
       <div className="hshade" />
       <div className="embers" aria-hidden="true">{[...Array(16)].map((_, j) => <i key={j} style={{ '--x': ((j * 37 + 11) % 100) + '%', '--s': (3 + (j % 4)) + 'px', '--d': (9 + (j % 6) * 2) + 's', '--l': -((j * 1.7) % 12) + 's', '--dx': ((j % 5) - 2) * 40 + 'px' }} />)}</div>
       <div className="wrap hero-in">
@@ -44,7 +41,6 @@ function Hero() {
           {n > 1 && <span className="dots2">{cards.map((x, j) => <i key={x.k} className={j === i % n ? 'on' : ''} />)}</span>}
         </Link>
       )}
-      <button className="pause" onClick={() => setPaused(!paused)} aria-pressed={paused}>{paused ? '▶ ' + t('Lecture', 'Play') : '❚❚ ' + t('Pause', 'Pause')}</button>
       <a className="down" href="#suite" aria-label={t('Défiler', 'Scroll down')}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="m6 9 6 6 6-6" /></svg></a>
     </section>
   );

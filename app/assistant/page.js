@@ -16,6 +16,7 @@ export default function Assistant() {
     const next = [...msgs, { role: 'user', content: q }];
     setMsgs(next); setV(''); setBusy(true);
     const r = await post('/api/chat', { messages: next, lang });
+    if (!r.reply) console.error('Assistant', r.error);
     setBusy(false);
     setMsgs([...next, { role: 'assistant', content: r.reply || t('Je ne peux pas répondre pour l\'instant. Réessayez dans un moment.', 'I cannot answer right now. Please try again shortly.') }]);
   }

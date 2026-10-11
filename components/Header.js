@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useApp } from './Providers';
+import InstallActions from './Install';
 
 export default function Header() {
   const { t, lang, setLang, theme, toggleTheme, cart, setCartOpen, S } = useApp();
@@ -50,6 +51,7 @@ export default function Header() {
             <Link href="/assistant" className="ai big" tabIndex={open ? 0 : -1}>{spark}<span>{ai}<small>{t('Posez vos questions sur la Bible', 'Ask your Bible questions')}</small></span></Link>
             <p>{S.address}</p>
             {S.phone && <p><a href={'tel:' + S.phone}>{S.phone}</a></p>}
+            <InstallActions />
           </div>
         </div>
       </div>

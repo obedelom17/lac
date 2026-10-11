@@ -11,10 +11,10 @@ Si une question dépasse la Bible ou la foi, ramène poliment la conversation ve
     const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
-      body: JSON.stringify({ model: "llama-3.3-70b-versatile", temperature: 0.4, max_tokens: 600, messages: [{ role: "system", content: system }, ...history] }),
+      body: JSON.stringify({ model: process.env.GROQ_MODEL || "openai/gpt-oss-20b", reasoning_effort: "low", temperature: 0.4, max_completion_tokens: 1500, messages: [{ role: "system", content: system }, ...history] }),
     });
     const j = await r.json();
-    if (!r.ok) return Response.json({ error: j.error?.message || "groq" }, { status: 502 });
+    if (!r.ok) { console.error("Groq error", r.status, j.error); return Response.json({ error: j.error?.message || "groq" }, { status: 502 }); }
     return Response.json({ reply: j.choices?.[0]?.message?.content || "" });
   } catch (e) {
     return Response.json({ error: String(e.message || e) }, { status: 500 });

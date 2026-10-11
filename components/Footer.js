@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useApp } from './Providers';
+import InstallActions from './Install';
 
 export default function Footer() {
   const { t, S } = useApp();
@@ -8,7 +9,7 @@ export default function Footer() {
   return (
     <footer className="bot">
       <div className="wrap foot">
-        <div><span className="chip big"><img src="/logo.png" alt="" /></span><p style={{ fontWeight: 600, color: '#fff' }}>{S.church_name}</p><p style={{ opacity: .8 }}>{S.address}</p></div>
+        <div><span className="chip big"><img src="/logo.png" alt="" /></span><p style={{ fontWeight: 600, color: '#fff' }}>{S.church_name}</p><p style={{ opacity: .8 }}>{S.address}</p><InstallActions /></div>
         <div>
           <h3>{t('Liens', 'Links')}</h3>
           <p><Link href="/rendez-vous">{t('Rencontrer un pasteur', 'Meet a pastor')}</Link></p>
